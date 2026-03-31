@@ -1,0 +1,26 @@
+{
+  "name": "cdk-beginner-handson",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AWS CDK beginner workshop project for learning L1, L2, and L3 constructs.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.14.1",
+    "aws-cdk": "^2.1000.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-solutions-constructs/aws-sqs-lambda": "^2.100.1",
+    "aws-cdk-lib": "^2.190.0",
+    "constructs": "^10.4.2"
+  }
+}
