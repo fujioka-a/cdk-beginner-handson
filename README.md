@@ -1,7 +1,6 @@
 # cdk-beginner-handson
 
-AWS CDK の初学者向けハンズオン用リポジトリです。  
-第1回では S3 を使って CDK の基本操作を学び、第2回では SQS を使って L1 / L2 / L3 の違いを体感します。
+AWS CDK の初学者向けハンズオン用リポジトリ
 
 ## Goal
 
@@ -61,16 +60,46 @@ node --version
 - ここでは「Node をセットアップすること」だけ把握しておけば十分です。
 - `mise` はあくまで参考です。`nvm` や `volta` でも問題ありません。
 
+## Prerequisites
+
+- AWS 認証情報を設定したうえで実行してください。
+- 事前に対象リージョンで `cdk bootstrap` を 1 回実施してください。
+- 参加者ごとに AWS アカウントを分離する前提です。このため SQS や Lambda の固定名は問題になりにくいですが、S3 のようなグローバル一意名が必要なリソースは別途注意が必要です。
+
+```bash
+aws sts get-caller-identity
+export AWS_REGION=ap-northeast-1
+npx cdk bootstrap aws://<ACCOUNT_ID>/${AWS_REGION}
+```
+
 ## Commands
 
 ```bash
+# パッケージインストール
 npm ci
+
 npm run build
 npm run lint
 npm run format
+npm run test
+
+# ブートストラップ（事前に1回だけ実行）
+npx cdk bootstrap
+
+# CloudFormation テンプレートの生成
 npx cdk synth
+
+# デプロイによる差分の事前チェック
 npx cdk diff
+
+# デプロイ（スタックを指定）
+npx cdk deploy FirstSessionStack
+
+# デプロイ（全スタックを指定）
 npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+
+# クリーンアップ
+npx cdk destroy --all --force
 ```
 
 ## Notes
@@ -78,6 +107,26 @@ npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
 - 第1回と第2回のリソースは別スタックに分離しています。
 - 参加者が読みやすいように、複雑な抽象化は避けてコメントを多めに入れています。
 - 第2回では CloudFormation Outputs からキュー URL と Lambda 関数名を確認できます。
+- `cdk.json` には推奨 feature flags を固定し、CDK バージョン更新時の挙動差分を減らしています。
+
+## L3 Resource Flow
+
+第2回の L3 では、`SqsToLambda` が以下の関係をまとめて作成します。
+
+```mermaid
+flowchart LR
+  Producer[CLI / Producer]
+  MainQueue[SQS Main Queue]
+  Lambda[Lambda Processor]
+  DLQ[SQS Dead Letter Queue]
+  Logs[CloudWatch Logs]
+
+  Producer -->|send-message| MainQueue
+  MainQueue -->|event source mapping| Lambda
+  Lambda -->|success: delete message| MainQueue
+  MainQueue -->|retry exceeds maxReceiveCount| DLQ
+  Lambda -->|execution logs| Logs
+```
 
 ## CLI Validation Example
 
