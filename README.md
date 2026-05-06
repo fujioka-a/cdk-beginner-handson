@@ -46,44 +46,65 @@ cdk-beginner-handson/
 - L3: `SqsToLambda` （AWS Solutions Constructs の公式パターン）
 - SQS + Lambda のデプロイ差分と CLI 確認を実施
 
-## Node Setup
+## Setup
+
+### Node
 
 Node.js 22 系が使える状態にしてからハンズオンを始めてください。
 導入方法は各自の使い慣れたものを使って構いません。
-たとえば `mise` を使う場合は、次のように Node をセットアップできます。
+たとえば `mise` を使う場合は、次のように Node をセットアップできます。(`nvm` や `volta` でも問題ありません。)
 
 ```bash
 mise use -g node@22
 node --version
 ```
 
-- ここでは「Node をセットアップすること」だけ把握しておけば十分です。
-- `mise` はあくまで参考です。`nvm` や `volta` でも問題ありません。
-
-## Prerequisites
+### Authentication
 
 - AWS 認証情報を設定したうえで実行してください。
-- 事前に対象リージョンで `cdk bootstrap` を 1 回実施してください。
+  - 方法①：`aws configure` コマンドで設定
+  - 方法②：（認証情報を払い出せない場合）CloudShellでの実行
+
 - 参加者ごとに AWS アカウントを分離する前提です。このため SQS や Lambda の固定名は問題になりにくいですが、S3 のようなグローバル一意名が必要なリソースは別途注意が必要です。
 
-```bash
-aws sts get-caller-identity
-export AWS_REGION=ap-northeast-1
-npx cdk bootstrap aws://<ACCOUNT_ID>/${AWS_REGION}
-```
+## CDK phase
 
-## Commands
+### init
+
+#### リポジトリを利用する場合
+
+⚠️⚠️⚠️ ここはワークショップで自前で用意するため、スキップしてください ⚠️⚠️⚠️
 
 ```bash
+# ripository clone 
+git clone https://github.com/fujioka-a/cdk-beginner-handson.git
+
 # パッケージインストール
 npm ci
 
-npm run build
-npm run lint
-npm run format
-npm run test
+```
 
-# ブートストラップ（事前に1回だけ実行）
+#### 自前でCDKプロジェクトを作成する場合
+
+```bash
+# CDK(コマンド)のインストール
+npm install -g aws-cdk
+
+cdk --version
+
+mkdir cdk-beginner-handson
+cd cdk-beginner-handson
+
+cdk init sample-app --language=typescript
+
+# アプリ用のパッケージインストール(第2回で使用)
+npm install @aws-solutions-constructs/aws-sqs-lambda
+```
+
+### deploy
+
+```bash 
+# ブートストラップ（事前に1回だけ実行すればOK）
 npx cdk bootstrap
 
 # CloudFormation テンプレートの生成
@@ -97,7 +118,11 @@ npx cdk deploy FirstSessionStack
 
 # デプロイ（全スタックを指定）
 npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+```
 
+### destroy
+
+```bash
 # クリーンアップ
 npx cdk destroy --all --force
 ```
