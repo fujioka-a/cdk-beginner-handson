@@ -99,6 +99,13 @@ cdk init sample-app --language=typescript
 npm install @aws-solutions-constructs/aws-sqs-lambda
 ```
 
+### implement
+
+第1回と第2回それぞれで、以下ドキュメントを参照してCDK実装しましょう。
+
+- Session 1: [README.session1.md](./docs/README.session1.md)
+- Session 2: [README.session2.md](./docs/README.session2.md)
+
 ### deploy
 
 ```bash 
