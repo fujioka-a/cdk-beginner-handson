@@ -1,13 +1,20 @@
 # Session 2: SQS Constructs with L1 / L2 / L3
 
+## 前提
+
 この手順は、Session 1 の実装が残っている前提で進めます。
 つまり、`FirstSessionStack` で S3 Bucket を作成できる状態から、別スタックとして `SecondSessionStack` を追加します。
 
-Session 2 の目的は、**SQS 関連リソースを使って L1 / L2 / L3 Construct の違いを体験すること**です。
-S3 Bucket は Session 1 の範囲なので、この Session では扱いません。
+## このセッションで何をやるか
 
-正解例は `lib/stacks_answer/second-session-stack.ts` にあります。
-まずはこのドキュメントのコメントとプレースホルダーに沿って、自分で `lib/stacks/second-session-stack.ts` を作成してください。
+- 以下を実施します
+  - L1 Construct の `CfnQueue` で SQS Queue を 1 つ作成する
+  - L2 Construct の `Queue` で SQS Queue を 1 つ作成する
+  - L3 Construct の `SqsToLambda` で SQS Queue + DLQ + Lambda consumer の構成を作成する
+  - 実装と`cdk synth` と `cdk diff` で、L1 / L2 / L3 の違いを体感する
+- ※L3 では Lambda も作成しますが、これは SQS Queue を処理する consumer として扱います。
+
+※正解例は [`lib/stacks_answer/second-session-stack.ts`](../lib/stacks_answer/second-session-stack.ts) にあります。
 
 ## 1. 追加パッケージをインストールする
 
@@ -40,7 +47,6 @@ exports.handler = async (event) => {
 ## 3. SecondSessionStack を作成する
 
 `lib/stacks/second-session-stack.ts` を作成します。
-Session 1 の `FirstSessionStack` とは別のスタックにし、SQS 関連リソースだけを扱います。
 
 最初は次のように、コメントとプレースホルダーを置いた状態から始めてください。
 L1 / L2 / L3 のそれぞれで、同じ SQS というサービスを違う抽象度から定義します。
@@ -112,12 +118,12 @@ export class SecondSessionStack extends Stack {
 
 ポイント:
 
-- L1 の `CfnQueue` は CloudFormation リソースに近い書き方です。
-- L2 の `Queue` は CDK らしい型付きの書き方です。
-- L3 の `SqsToLambda` は、複数リソースの組み合わせを公式パターンとして扱います。
-- Session 2 では SQS 関連リソースの違いに集中するため、Session 1 の S3 Bucket は変更しません。
+- `CfnQueue` は CloudFormation リソースに近い L1 Construct です。
+- `Queue` は CDK らしい型付きの L2 Construct です。
+- `SqsToLambda` は、複数リソースの組み合わせを公式パターンとして扱う L3 Construct です。
+- `queueName` を指定しているため、同じ AWS アカウント・同じリージョンに同じ名前のキューが既にあるとデプロイに失敗します。
 
-## 4. CDK アプリに SecondSessionStack を追加する
+## 4. CDK アプリのエントリーポイントを更新する
 
 `bin/workshop.ts` に `SecondSessionStack` を追加します。
 Session 1 の `FirstSessionStack` は残したままにします。
@@ -137,6 +143,14 @@ new FirstSessionStack(app, "FirstSessionStack", {
 new SecondSessionStack(app, "SecondSessionStack", {
   stackName: "cdk-workshop-second-session",
 });
+```
+
+`cdk.json` の `app` は、Session 1 で設定した `bin/workshop.ts` のままでOKです。
+
+```json
+{
+  "app": "npx ts-node --prefer-ts-exts bin/workshop.ts"
+}
 ```
 
 ## 5. 確認する
@@ -160,7 +174,7 @@ npx cdk synth SecondSessionStack
 npx cdk diff SecondSessionStack
 ```
 
-問題なければ Session 2 のスタックをデプロイします。
+問題なければデプロイします。
 
 ```bash
 npx cdk deploy SecondSessionStack
@@ -173,3 +187,9 @@ npx cdk deploy SecondSessionStack
 - `L3QueueUrl`
 - `L3DeadLetterQueueUrl`
 - `L3LambdaName`
+
+ワークショップ終了後は、作成したリソースを削除してクリーンアップしましょう。
+
+```bash
+npx cdk destroy SecondSessionStack
+```
