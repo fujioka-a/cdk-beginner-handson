@@ -31,17 +31,12 @@ L1/L2/L3の違いを体感することにフォーカスしたCDKハンズオン
 cdk-beginner-handson/
 ├── bin/
 │   └── workshop.ts
-├── lib/
 ├── lambda/
 │   └── index.js
-│
 ├── lib/
-│   ├── stacks/
-│   │   ├── first-session-stack.ts
-│   │   └── second-session-stack.ts
-│   │
-│   └── shared/
-│       └── tags.ts
+│   └── stacks/
+│       ├── first-session-stack.ts
+│       └── second-session-stack.ts
 │
 ├── package.json
 ├── tsconfig.json

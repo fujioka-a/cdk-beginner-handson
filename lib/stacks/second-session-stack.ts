@@ -3,13 +3,10 @@ import { CfnOutput, Duration, Stack, type StackProps } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { CfnQueue, Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
-import { applyWorkshopTags } from "../shared/tags";
 
 export class SecondSessionStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
-
-    applyWorkshopTags(this);
 
     // L1
     // CfnQueue は CloudFormation にかなり近いレイヤーで、生成されるテンプレートとの対応を見せやすいです。

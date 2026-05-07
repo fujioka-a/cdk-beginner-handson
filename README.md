@@ -16,8 +16,6 @@ cdk-beginner-handson/
 ├── lambda/
 │   └── index.js
 ├── lib/
-│   ├── shared/
-│   │   └── tags.ts
 │   └── stacks/
 │       ├── first-session-stack.ts
 │       └── second-session-stack.ts
